@@ -48,7 +48,7 @@ class DataLoader():
         # IF path is None, use defult path
         if data_locator_path is None:
             data_locator_path = os.path.join('..', 'data_locator.txt')  # set to defult path
-            self.data_file_path = os.path.normpath(data_locator_path)   # converet to os.path normal path 
+            self.data_file_path = os.path.normpath(data_locator_path)   # convert to os.path normal path 
 
         # ELSE (if path not None) use given path)
         else:
