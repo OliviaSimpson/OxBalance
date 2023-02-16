@@ -58,17 +58,17 @@ class DataLoader():
 
         # IF path is None, use defult path
         if data_locator_path is None:
-            data_locator_path = os.path.join('..', 'data_locator.txt')  # set to defult path
+            data_locator_path = os.path.join('data_locator.txt')  # set to defult path
             self.data_file_path = os.path.normpath(data_locator_path)   # convert to os.path normal path 
 
         # ELSE (if path not None) use given path)
         
         try:
             # Open Data locator and read path to data file
-            data_locator = open(data_locator_path, "r")     
-            abspath = os.path.abspath(data_locator.readline())
+            data_location = open(data_locator_path, "r")     
+            abspath = os.path.abspath(data_location.readline())
             self.data_file_path = os.path.normpath(abspath)
-            data_locator.close()
+            data_location.close()
 
         except FileNotFoundError:
             # If file not found present error message
@@ -84,14 +84,6 @@ class DataLoader():
         #     raise Exception(f"The selected data file (\"{self.data_file_path}\") does not exist")
 
 
-    # def show_data_file_path(self):
-    #     print(self.data_file_path)
-
-    #     data_locator_path = (os.path.join('..', 'data_locator.txt'))
-    #     data_locator = open(data_locator_path, "r")
-    #     self.data_file_path = os.path.normpath(data_locator.readline())
-    #     data_locator.close()
-    #     return self.data_file_path
 
     def test_data_file(self):
         passingtests = []
