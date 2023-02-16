@@ -372,3 +372,6 @@ MigrationBackup/
 *.tar.gz
 *.z
 *.zip
+
+# Data label map
+data_organization.png
