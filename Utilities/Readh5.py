@@ -1,5 +1,6 @@
 import h5py
 from Loader import DataLoader
+import pandas as pd
 
 
 # with h5py.File(data_source.data_file_path, "r") as datafile:
@@ -22,10 +23,16 @@ class h5_handler():
         self.source = source
 
     def open_file(self):
-        datafile = h5py.File(self.source, 'r')
+        self.datafile = h5py.File(self.source, 'r')
 
     def get_keys(self):
-        print(f"Keys: {self.datafile.keys()}")
+        self.primaryeys = self.datafile.keys()
+        print(f"Keys: {self.primaryeys}")
+
+    def loaddata(self):
+        pd.read_hdf(self.source, key=self.primaryeys[0])
+    
+
 
 
 data_source = DataLoader()

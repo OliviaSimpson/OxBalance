@@ -3,4 +3,5 @@ channels:
   - defaults
 dependencies:
   - h5py>=3.7.0
+  - pandas
 prefix: /home/olisim/miniconda3/envs/OxBalance
