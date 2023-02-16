@@ -20,12 +20,23 @@ class DataLoader():
         development tool to check the data file path
     """
 
-    def __init__(self, input_path=None) -> None:
+    def __init__(self, input_path=None, verbose=False) -> None:
 
-        if '.h5' in input_path:
-            self.data_file_path = input_path
-        else:
+        self.data_file_path = None
+        self.verbose = verbose
+
+
+        if input_path != None:
+            if '.h5' in input_path: # if the data file is an h5
+                self.data_file_path = input_path
+        if self.data_file_path == None:     # if data file path is still uset, find the data file from the locator
             self.find_data_file_from_locator(input_path)
+        
+        if self.test_data_file() is True:
+            if self.verbose == True:
+                print(f"Data File Path: {self.data_file_path}")
+        
+
 
     def find_data_file_from_locator(self, data_locator_path):
         """Locates data file
@@ -51,17 +62,17 @@ class DataLoader():
             self.data_file_path = os.path.normpath(data_locator_path)   # convert to os.path normal path 
 
         # ELSE (if path not None) use given path)
-        else:
-            try:
-                # Open Data locator and read path to data file
-                data_locator = open(data_locator_path, "r")     
-                abspath = os.path.abspath(data_locator.readline())
-                self.data_file_path = os.path.normpath(abspath)
-                data_locator.close()
+        
+        try:
+            # Open Data locator and read path to data file
+            data_locator = open(data_locator_path, "r")     
+            abspath = os.path.abspath(data_locator.readline())
+            self.data_file_path = os.path.normpath(abspath)
+            data_locator.close()
 
-            except FileNotFoundError:
-                # If file not found present error message
-                raise Exception(f"Data locator file not found at \"{data_locator_path}\"")
+        except FileNotFoundError:
+            # If file not found present error message
+            raise Exception(f"Data locator file not found at the path: \"{data_locator_path}\"")
 
         # if os.path.exists(self.data_file_path):
         #     return self.data_file_path
@@ -73,16 +84,34 @@ class DataLoader():
         #     raise Exception(f"The selected data file (\"{self.data_file_path}\") does not exist")
 
 
-    def show_data_file_path(self):
-        print(self.data_file_path)
+    # def show_data_file_path(self):
+    #     print(self.data_file_path)
 
-        data_locator_path = (os.path.join('..', 'data_locator.txt'))
-        data_locator = open(data_locator_path, "r")
-        self.data_file_path = os.path.normpath(data_locator.readline())
-        data_locator.close()
-        return self.data_file_path
+    #     data_locator_path = (os.path.join('..', 'data_locator.txt'))
+    #     data_locator = open(data_locator_path, "r")
+    #     self.data_file_path = os.path.normpath(data_locator.readline())
+    #     data_locator.close()
+    #     return self.data_file_path
 
+    def test_data_file(self):
+        passingtests = []
+        passingtests.append(os.path.exists(self.data_file_path))
+        try:
+                data_file = open(self.data_file_path, "r")
+                #     print(data_file.readline())
+                data_file.close()
+                passingtests.append(True)
+        except:
+            passingtests.append(False)
+            raise Exception(f"Data file: \"{self.data_file_path}\" will not open")
+        
+        if self.verbose == True:
+            if passingtests == [True, True]:
+                print(f"Data File: {self.data_file_path} appers good")
+            elif passingtests[0] == False:
+                print(f"Data File: {self.data_file_path} dosent exist")
+            else:
+                print(f"Data File: {self.data_file_path} dosent open")
 
-
-data = DataLoader()
-data.show_data_file_path()
+data = DataLoader(verbose=True)
+# data.show_data_file_path()
