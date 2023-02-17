@@ -1,16 +1,9 @@
 import h5py
 from Loader import DataLoader
+import numpy as np
 import pandas as pd
 
 
-# with h5py.File(data_source.data_file_path, "r") as datafile:
-#     print("Keys: %s" % datafile.keys())
-#     a_group_key = list(datafile.keys())[0]
-
-#     print(type(datafile[a_group_key])) 
-
-#     data = list(datafile[a_group_key])
-#     print(data)
 
 class h5_handler():
 
@@ -24,17 +17,35 @@ class h5_handler():
 
     def open_file(self):
         self.datafile = h5py.File(self.source, 'r')
-
-    def get_keys(self):
-        self.primaryeys = self.datafile.keys()
-        print(f"Keys: {self.primaryeys}")
-
-    def loaddata(self):
-        pd.read_hdf(self.source, key=self.primaryeys[0])
+        print(list(self.datafile.keys()))
+        print(list(self.datafile.keys())[1])
     
+    def close_file(self):
+        self.datafile.close()
+    
+    def get_subject_list(self, key):
+        print(self.datafile)
+        # hdf = pd.HDFStore(self.source, mode='r')
+        subjectlist = pd.read_hdf(self.source, key=key, mode='r')
+        return(subjectlist)
+
+
+def createdummydata():
+    hdf = pd.HDFStore('dummy_h5.h5')
+    write_data = pd.DataFrame(np.random.rand(5,3))
+    hdf.put('key1', write_data)
+    write_2_data = pd.DataFrame(np.random.rand(3,3))
+    hdf.put('key2', write_2_data)
+    write_3_data = pd.DataFrame(np.random.rand(7,7))
+    hdf.put('key3', write_3_data)
+    hdf.close()
 
 
 
-data_source = DataLoader()
-dataset = h5_handler(data_source.data_file_path)
-dataset.get_keys()
+source = DataLoader().data_file_path
+
+trialdata = h5_handler(source)
+print(trialdata.get_subject_list('key1'))
+print(trialdata.get_subject_list('key2'))
+print(trialdata.get_subject_list('key3'))
+trialdata.close_file()
