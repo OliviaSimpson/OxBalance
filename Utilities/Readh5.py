@@ -18,7 +18,7 @@ class h5_handler():
     def open_file(self):
         self.datafile = h5py.File(self.source, 'r')
         print(list(self.datafile.keys()))
-        print(list(self.datafile.keys())[1])
+        print(list(self.datafile.keys())[-1])
     
     def close_file(self):
         self.datafile.close()
@@ -26,7 +26,7 @@ class h5_handler():
     def get_subject_list(self, key):
         print(self.datafile)
         # hdf = pd.HDFStore(self.source, mode='r')
-        subjectlist = pd.read_hdf(self.source, key=key, mode='r')
+        subjectlist = pd.read_hdf(self.source, key=list(self.datafile.keys())[-1], mode='r')
         return(subjectlist)
 
 
