@@ -59,21 +59,24 @@ class h5_handler():
 
         if type(axisToggle) == list:
             axisToggle['acc'] = axisToggle[0]
-            axisToggle['gyr'] = axisToggle[0]
-            axisToggle['mag'] = axisToggle[0]
+            axisToggle['gyr'] = axisToggle[1]
+            axisToggle['mag'] = axisToggle[2]
 
 
-        if axisToggle['acc'] == True:
+        if axisToggle['acc'] is True:
             outputDict.update({'acc':self.HDFfile.get(f"/{subjectID}/smartphone/{trialID}/{deviceID}/acc")})
-        if axisToggle['gyr'] == True:
+        if axisToggle['gyr'] is True:
             outputDict.update({'gyr':self.HDFfile.get(f"/{subjectID}/smartphone/{trialID}/{deviceID}/gyr")})
-        if axisToggle['mag'] == True:
+        if axisToggle['mag'] is True:
             outputDict.update({'mag':self.HDFfile.get(f"/{subjectID}/smartphone/{trialID}/{deviceID}/mag")})
 
         return outputDict
     
-    def getDeviceLocations(self, subjectID, TrialID):
-        self.HDFfile.get(f'/{subjectID}/smartphone_device_location')
+    def getDeviceLocations(self, subjectID, TrialID, Position):
+
+        deviceLocations = (self.HDFfile.get(f'/{subjectID}/smartphone_device_location'))
+        selecteddevice = deviceLocations.loc[deviceLocations['location'] == Position]
+        return selecteddevice["device_id"].to_string(index=False)
 
 
 
@@ -83,7 +86,7 @@ def createdummydata():
     hdf.put('abcd', pd.DataFrame(np.random.rand(3,3)))
     hdf.put('abcd/active_test_info', pd.DataFrame(np.random.rand(2,1)))
     location = ["belt_back", "belt_front", "pocket_back_right", "pocket_back_left", "pocket_front_right", "pocket_front_left"]
-    tag = ["0001", "001", "002", "003", "004","005"]
+    tag = ["000", "001", "002", "003", "004","005"]
     hdf.put('abcd/smartphone_device_location', pd.DataFrame(list(zip(location, tag)), columns=["location", "device_id"]))
     hdf.put('abcd/smartphone/10/000/acc', pd.DataFrame(np.random.rand(100,3)))
     hdf.put('abcd/smartphone/10/000/gyr', pd.DataFrame(np.random.rand(100,3)))
@@ -114,9 +117,10 @@ subjectid = trialdata.subject_code_from_index(0)
 print(f"subjectID:{subjectid}")
 print(trialdata.getActiveTestInfo(subjectid))
 
-print(trialdata.getVicon(subjectid, 10))
-deviceid = "000"
-print(trialdata.getSmartphoneData(subjectid, 10, deviceid))
+trialid = 10
+print(trialdata.getVicon(subjectid, trialid))
+deviceid = trialdata.getDeviceLocations(subjectid, trialid, 'belt_back')
+print(trialdata.getSmartphoneData(subjectid, trialid, deviceid))
 #print(trialdata.getTestIDs(subjectid))
 
 # trialdata.close_file()
