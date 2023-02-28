@@ -10,121 +10,100 @@ class h5_handler():
     def __init__(self, source,verbose=False) -> None:
         self.verbose = verbose
         self.set_source(source)
-        self.open_file()
+        # self.open_file()
         self.subjectlist = None
 
     def set_source(self, source):
         self.source = source
+        self.HDFfile = pd.HDFStore(source, mode='r')
 
-    def open_file(self):
-        self.datafile = h5py.File(self.source, 'r')
-        # print(list(self.datafile.keys()))
-        # print(list(self.datafile.keys())[-1])
-        # print(list(self.datafile[subjectID].keys()))
-        # print(list(self.datafile[subjectID]['smartphone'].keys()))
+    # def open_file(self):
+    #     self.datafile = h5py.File(self.source, 'r')
     
-    def close_file(self):
-        self.datafile.close()
+    # def close_file(self):
+    #     self.datafile.close()
     
     def get_subject_list(self):
-        print(self.datafile)
         # hdf = pd.HDFStore(self.source, mode='r')
-        self.subjectlist = pd.read_hdf(self.source, key=list(self.datafile.keys())[-1], mode='r')
+        self.subjectlist = self.HDFfile.get("/subject_list")
         return(self.subjectlist)
     
     def subject_code_from_index(self, index, setSubject=False):
         """
         Broken?
         """
+
         if type(self.subjectlist) == None:
             self.get_subject_list()
         if self.verbose is True:
+            print('sub')
+            print(type(self.subjectlist))
+            print('sub[index]')
+            print(type(self.subjectlist.iloc[index]))
+            # print(self.subjectlist.iloc[index])
             print(f"Subject code: {self.subjectlist.iloc[index].tolist()}")
         
         return self.subjectlist.iloc[index].tolist()[0]
     
-
-    
-    def subject_index_from_code(self, code):
-        if type(self.subjectlist) == None:
-            self.get_subject_list()
-        SubjectIndex = self.subjectlist.index[self.subjectlist['subject'] == code].tolist()
-        if self.verbose is True:
-            if len(SubjectIndex) == 1:
-                print(f"One subject index result: {SubjectIndex}")
-            elif len(SubjectIndex) == 0:
-                print(f"No subject index results")
-            else:
-                print(f"Multiple subject index results: {SubjectIndex}")
-        return SubjectIndex
-    
-
-    def getTestIDs(self, subjectID):
-        self.TestIDs = list(self.datafile[subjectID]['smartphone'].keys())
-        return self.TestIDs
-    
     def getActiveTestInfo(self, subjectID):
-        self.ActiveTestInfo = pd.read_hdf(self.source, key=f'/{subjectID}/active_test_info')
+        self.ActiveTestInfo = self.HDFfile.get(f"/{subjectID}/active_test_info")
         return self.ActiveTestInfo
 
+    def getVicon(self, subjectID, testID):
+        return self.HDFfile.get(f"/{subjectID}/vicon/{testID}")
+    
 
-        
-# class subject_data():
-#     def __init__(self, source, subject_ID) -> None:
-#         self.source = source
-#         self.id = subject_ID
-#         self.tests = pd.read_hdf(self.source, key=f'/{self.id}/active_test_info')
-#         print(self.tests)
+    def getSmartphoneData(self, subjectID, trialID, deviceID, axisToggle = {'acc':True, 'gyr':True, 'mag':True }):
 
-#     def getsmartphonedata(self):
-#         self.device = 'device_id:a'
-#         print(pd.read_hdf(self.source, key=f'/{self.id}/smartphone/*/{self.device}'))
+        outputDict = {}
 
-
+        if type(axisToggle) == list:
+            axisToggle['acc'] = axisToggle[0]
+            axisToggle['gyr'] = axisToggle[0]
+            axisToggle['mag'] = axisToggle[0]
 
 
-# class test_data():
+        if axisToggle['acc'] == True:
+            outputDict.update({'acc':self.HDFfile.get(f"/{subjectID}/smartphone/{trialID}/{deviceID}/acc")})
+        if axisToggle['gyr'] == True:
+            outputDict.update({'gyr':self.HDFfile.get(f"/{subjectID}/smartphone/{trialID}/{deviceID}/gyr")})
+        if axisToggle['mag'] == True:
+            outputDict.update({'mag':self.HDFfile.get(f"/{subjectID}/smartphone/{trialID}/{deviceID}/mag")})
 
-#     def loadIMU(self, subject=None, test_id=None, device_id=None, channles=['acc', 'gyr', 'mag']):
-#         if subject == None:
-#             subject = self.currentsubject
-#         if test_id == None:
-#             test_id == self.currenttest_id
-#         if device_id == None:
-#             device_id == self.currentdevice_id
+        return outputDict
+    
+    def getDeviceLocations(self, subjectID, TrialID):
+        self.HDFfile.get(f'/{subjectID}/smartphone_device_location')
 
-
-#         if 'acc' in channles:
-#             accSelected = True
-#             print(pd.read_hdf(self.source, key=f'/{subject}/smartphone/testid:0/device_id:a/acc'))
-#         if 'gyr' in channles:
-#             gyrSelected = True
-#             print(pd.read_hdf(self.source, key=f'/{subject}/smartphone/testid:0/device_id:a/gyr'))
-#         if 'mag' in channles:
-#             accSelected = True
-#             print(pd.read_hdf(self.source, key=f'/{subject}/smartphone/testid:0/device_id:a/mag'))
 
 
 
 def createdummydata():
-    hdf = pd.HDFStore('dummy_h5.h5')
+    hdf = pd.HDFStore('dummy_h5.h5', mode='w')
     hdf.put('abcd', pd.DataFrame(np.random.rand(3,3)))
     hdf.put('abcd/active_test_info', pd.DataFrame(np.random.rand(2,1)))
-    hdf.put('abcd/smartphone/testid:0/device_id:a/acc', pd.DataFrame(np.random.rand(100,3)))
-    hdf.put('abcd/smartphone/testid:0/device_id:a/gyr', pd.DataFrame(np.random.rand(100,3)))
-    hdf.put('abcd/smartphone/testid:0/device_id:a/mag', pd.DataFrame(np.random.rand(100,3)))
-    hdf.put('abcd/smartphone/testid:1/device_id:a/acc', pd.DataFrame(np.random.rand(100,3)))
-    hdf.put('abcd/smartphone/testid:1/device_id:a/gyr', pd.DataFrame(np.random.rand(100,3)))
-    hdf.put('abcd/smartphone/testid:1/device_id:a/mag', pd.DataFrame(np.random.rand(100,3)))
+    location = ["belt_back", "belt_front", "pocket_back_right", "pocket_back_left", "pocket_front_right", "pocket_front_left"]
+    tag = ["0001", "001", "002", "003", "004","005"]
+    hdf.put('abcd/smartphone_device_location', pd.DataFrame(list(zip(location, tag)), columns=["location", "device_id"]))
+    hdf.put('abcd/smartphone/10/000/acc', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/smartphone/10/000/gyr', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/smartphone/10/000/mag', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/smartphone/11/000/acc', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/smartphone/11/000/gyr', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/smartphone/11/000/mag', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/vicon/10/', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/vicon/11/', pd.DataFrame(np.random.rand(100,3)))
     hdf.put('efgh', pd.DataFrame(np.random.rand(3,3)))
     hdf.put('ijkl', pd.DataFrame(np.random.rand(3,3)))
     hdf.put('mnop', pd.DataFrame(np.random.rand(3,3)))
     slist = pd.DataFrame(['abcd', 'efgh', 'ijkl', 'mnop'], columns=['subject'])
-    hdf.put('subjectlist', slist)
+    hdf.put('subject_list', slist)
     hdf.close()
 
-
+### development ###
 createdummydata()
+
+    
 source = DataLoader().data_file_path
 
 trialdata = h5_handler(source, verbose=True)
@@ -134,9 +113,13 @@ subjectid = trialdata.subject_code_from_index(0)
 #trialdata.loadIMU('abcd')
 print(f"subjectID:{subjectid}")
 print(trialdata.getActiveTestInfo(subjectid))
-print(trialdata.getTestIDs(subjectid))
 
-trialdata.close_file()
+print(trialdata.getVicon(subjectid, 10))
+deviceid = "000"
+print(trialdata.getSmartphoneData(subjectid, 10, deviceid))
+#print(trialdata.getTestIDs(subjectid))
+
+# trialdata.close_file()
 
 
 # s = subject_data(source, 'abcd')
