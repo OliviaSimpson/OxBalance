@@ -41,9 +41,11 @@ class h5_handler():
             print('sub[index]')
             print(type(self.subjectlist.iloc[index]))
             # print(self.subjectlist.iloc[index])
-            print(f"Subject code: {self.subjectlist.iloc[index].tolist()}")
-        
-        return self.subjectlist.iloc[index].tolist()[0]
+            print(f"Subject code: {self.subjectlist.iloc[index]}")
+        subjectCode = self.subjectlist.iloc[index]
+        if type(subjectCode) is not str:
+            subjectCode = subjectCode.to_string(index = False)
+        return subjectCode
     
     def getActiveTestInfo(self, subjectID):
         self.ActiveTestInfo = self.HDFfile.get(f"/{subjectID}/active_test_info")
@@ -99,7 +101,7 @@ def createdummydata():
     hdf.put('efgh', pd.DataFrame(np.random.rand(3,3)))
     hdf.put('ijkl', pd.DataFrame(np.random.rand(3,3)))
     hdf.put('mnop', pd.DataFrame(np.random.rand(3,3)))
-    slist = pd.DataFrame(['abcd', 'efgh', 'ijkl', 'mnop'], columns=['subject'])
+    slist = pd.DataFrame(['abcd', 'efgh', 'ijkl', 'mnop'])
     hdf.put('subject_list', slist)
     hdf.close()
 
