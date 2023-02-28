@@ -95,10 +95,10 @@ def createdummydata():
     hdf.put('abcd', pd.DataFrame(np.random.rand(3,3)))
     testid = [10,11,15,20]
     begin = [0,0,0,0]
-    testtype = ["BALLANCE__NATURAL_STANCE_EYES_OPEN",
-            "BALLANCE__NATURAL_STANCE_EYES_CLOSED",
-            "BALLANCE__LEFT_FOOT_EYES_OPEN",
-            "BALLANCE__LEFT_FOOT_EYES_OPEN"]
+    testtype = ["BALANCE__NATURAL_STANCE_EYES_OPEN",
+            "BALANCE__NATURAL_STANCE_EYES_CLOSED",
+            "BALANCE__LEFT_FOOT_EYES_OPEN",
+            "BALANCE__LEFT_FOOT_EYES_OPEN"]
     teststatus = ["COMPLETE", "COMPLETE", "COMPLETE", "COMPLETE"]
     hdf.put('abcd/active_test_info', pd.DataFrame(list(zip(testid, begin, testtype, teststatus)), columns=["id", "begin", "type", "status"]))
     location = ["belt_back", "belt_front", "pocket_back_right", "pocket_back_left", "pocket_front_right", "pocket_front_left"]
@@ -131,9 +131,9 @@ subjectid = trialdata.subject_code_from_index(0)
 print(f"subjectID:{subjectid}")
 print(trialdata.getActiveTestInfo(subjectid))
 
-trialid = trialdata.selectTestID(subjectid, "BALLANCE__NATURAL_STANCE_EYES_OPEN")
+trialid = trialdata.selectTestID(subjectid, "BALANCE__NATURAL_STANCE_EYES_OPEN")
 print(trialid)
-# trialid = trialdata.selectTestID(subjectid, "BALLANCE__LEFT_FOOT_EYES_OPEN")
+# trialid = trialdata.selectTestID(subjectid, "BALANCE__LEFT_FOOT_EYES_OPEN")
 # print(trialid)
 print(trialdata.getVicon(subjectid, trialid))
 # deviceid = trialdata.getDeviceLocations(subjectid, trialid, 'belt_back')
