@@ -10,29 +10,18 @@ class h5_handler():
     def __init__(self, source,verbose=False) -> None:
         self.verbose = verbose
         self.set_source(source)
-        # self.open_file()
         self.subjectlist = None
+        self.ActiveTestInfo = None
 
     def set_source(self, source):
         self.source = source
         self.HDFfile = pd.HDFStore(source, mode='r')
-
-    # def open_file(self):
-    #     self.datafile = h5py.File(self.source, 'r')
-    
-    # def close_file(self):
-    #     self.datafile.close()
     
     def get_subject_list(self):
-        # hdf = pd.HDFStore(self.source, mode='r')
         self.subjectlist = self.HDFfile.get("/subject_list")
         return(self.subjectlist)
     
     def subject_code_from_index(self, index, setSubject=False):
-        """
-        Broken?
-        """
-
         if type(self.subjectlist) == None:
             self.get_subject_list()
         if self.verbose is True:
@@ -50,6 +39,24 @@ class h5_handler():
     def getActiveTestInfo(self, subjectID):
         self.ActiveTestInfo = self.HDFfile.get(f"/{subjectID}/active_test_info")
         return self.ActiveTestInfo
+    
+    def selectTestID(self, subjectID, testType, compleation = True):
+        # if self.ActiveTestInfo == None:
+        ati = self.getActiveTestInfo(subjectID)
+        if compleation == True:
+            ati = ati.loc[ati['status'] == 'COMPLETE']
+        elif compleation == False:
+            ati = ati.loc[ati['status'] != 'COMPLETE']
+        selectedtests  = ati.loc[ati['type'] == testType]
+        if len(selectedtests) == 1:
+            return selectedtests['id'].to_string(index = False)
+        elif len(selectedtests) > 1:
+            return selectedtests['id'].to_list()
+
+        return selectedtests
+
+
+        
 
     def getVicon(self, subjectID, testID):
         return self.HDFfile.get(f"/{subjectID}/vicon/{testID}")
@@ -86,7 +93,14 @@ class h5_handler():
 def createdummydata():
     hdf = pd.HDFStore('dummy_h5.h5', mode='w')
     hdf.put('abcd', pd.DataFrame(np.random.rand(3,3)))
-    hdf.put('abcd/active_test_info', pd.DataFrame(np.random.rand(2,1)))
+    testid = [10,11,15,20]
+    begin = [0,0,0,0]
+    testtype = ["BALLANCE__NATURAL_STANCE_EYES_OPEN",
+            "BALLANCE__NATURAL_STANCE_EYES_CLOSED",
+            "BALLANCE__LEFT_FOOT_EYES_OPEN",
+            "BALLANCE__LEFT_FOOT_EYES_OPEN"]
+    teststatus = ["COMPLETE", "COMPLETE", "COMPLETE", "COMPLETE"]
+    hdf.put('abcd/active_test_info', pd.DataFrame(list(zip(testid, begin, testtype, teststatus)), columns=["id", "begin", "type", "status"]))
     location = ["belt_back", "belt_front", "pocket_back_right", "pocket_back_left", "pocket_front_right", "pocket_front_left"]
     tag = ["000", "001", "002", "003", "004","005"]
     hdf.put('abcd/smartphone_device_location', pd.DataFrame(list(zip(location, tag)), columns=["location", "device_id"]))
@@ -114,20 +128,13 @@ source = DataLoader().data_file_path
 trialdata = h5_handler(source, verbose=True)
 print(trialdata.get_subject_list())
 subjectid = trialdata.subject_code_from_index(0)
-# print(f"subject 'abcd' index:{trialdata.subject_index_from_code(subjectid)}")
-#trialdata.loadIMU('abcd')
 print(f"subjectID:{subjectid}")
 print(trialdata.getActiveTestInfo(subjectid))
 
-trialid = 10
+trialid = trialdata.selectTestID(subjectid, "BALLANCE__NATURAL_STANCE_EYES_OPEN")
+print(trialid)
+# trialid = trialdata.selectTestID(subjectid, "BALLANCE__LEFT_FOOT_EYES_OPEN")
+# print(trialid)
 print(trialdata.getVicon(subjectid, trialid))
-deviceid = trialdata.getDeviceLocations(subjectid, trialid, 'belt_back')
-print(trialdata.getSmartphoneData(subjectid, trialid, deviceid))
-#print(trialdata.getTestIDs(subjectid))
-
-# trialdata.close_file()
-
-
-# s = subject_data(source, 'abcd')
-# print("****")
-# s.getsmartphonedata()
+# deviceid = trialdata.getDeviceLocations(subjectid, trialid, 'belt_back')
+# print(trialdata.getSmartphoneData(subjectid, trialid, deviceid))
