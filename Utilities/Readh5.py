@@ -48,12 +48,7 @@ class h5_handler():
         elif compleation == False:
             ati = ati.loc[ati['status'] != 'COMPLETE']
         selectedtests  = ati.loc[ati['type'] == testType]
-        if len(selectedtests) == 1:
-            return selectedtests['id'].to_string(index = False)
-        elif len(selectedtests) > 1:
-            return selectedtests['id'].to_list()
-
-        return selectedtests
+        return selectedtests['id'].to_list()
 
 
         
@@ -107,11 +102,15 @@ def createdummydata():
     hdf.put('abcd/smartphone/10/000/acc', pd.DataFrame(np.random.rand(100,3)))
     hdf.put('abcd/smartphone/10/000/gyr', pd.DataFrame(np.random.rand(100,3)))
     hdf.put('abcd/smartphone/10/000/mag', pd.DataFrame(np.random.rand(100,3)))
-    hdf.put('abcd/smartphone/11/000/acc', pd.DataFrame(np.random.rand(100,3)))
-    hdf.put('abcd/smartphone/11/000/gyr', pd.DataFrame(np.random.rand(100,3)))
-    hdf.put('abcd/smartphone/11/000/mag', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/smartphone/15/000/acc', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/smartphone/15/000/gyr', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/smartphone/15/000/mag', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/smartphone/20/000/acc', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/smartphone/20/000/gyr', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/smartphone/20/000/mag', pd.DataFrame(np.random.rand(100,3)))
     hdf.put('abcd/vicon/10/', pd.DataFrame(np.random.rand(100,3)))
-    hdf.put('abcd/vicon/11/', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/vicon/15/', pd.DataFrame(np.random.rand(100,3)))
+    hdf.put('abcd/vicon/20/', pd.DataFrame(np.random.rand(100,3)))
     hdf.put('efgh', pd.DataFrame(np.random.rand(3,3)))
     hdf.put('ijkl', pd.DataFrame(np.random.rand(3,3)))
     hdf.put('mnop', pd.DataFrame(np.random.rand(3,3)))
@@ -131,10 +130,11 @@ subjectid = trialdata.subject_code_from_index(0)
 print(f"subjectID:{subjectid}")
 print(trialdata.getActiveTestInfo(subjectid))
 
-trialid = trialdata.selectTestID(subjectid, "BALANCE__NATURAL_STANCE_EYES_OPEN")
-print(trialid)
-# trialid = trialdata.selectTestID(subjectid, "BALANCE__LEFT_FOOT_EYES_OPEN")
-# print(trialid)
-print(trialdata.getVicon(subjectid, trialid))
-# deviceid = trialdata.getDeviceLocations(subjectid, trialid, 'belt_back')
-# print(trialdata.getSmartphoneData(subjectid, trialid, deviceid))
+# trialids = trialdata.selectTestID(subjectid, "BALANCE__NATURAL_STANCE_EYES_OPEN")
+trialids = trialdata.selectTestID(subjectid, "BALANCE__LEFT_FOOT_EYES_OPEN")
+print(trialids)
+for currentTrialID in trialids:
+    print(currentTrialID)
+    print(trialdata.getVicon(subjectid, currentTrialID))
+    # deviceid = trialdata.getDeviceLocations(subjectid, currentTrialID, 'belt_back')
+    # print(trialdata.getSmartphoneData(subjectid, currentTrialID, deviceid))
