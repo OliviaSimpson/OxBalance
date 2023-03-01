@@ -5,40 +5,71 @@ import pandas as pd
 
 
 
-class h5_handler():
+class H5Handler():
+    """
+    A class to handel the reading of trial sensor data from a .h5 file
+    ...
+    Attributes
+    ----------
+    source
+        DataLoader class from Loader.py to indicate where the .h5 file is
+    verbose = False
+        Bool determins if functions print full messages or limited messages
+    Methods
+    -------
+    __init__()
+        initiates class and calls find_data_file
+    setSource()
+        Set or update the source being used and creates pandas hdf store
+    getSubjectList()
+        
+    subjectCodeFromIndex()
+
+    getActiveTestInfo()
+
+    selectTestID()
+
+    getVicon()
+
+    getSmartphoneData()
+
+    getDeviceLocations()
+    
+
+    """
 
     def __init__(self, source,verbose=False) -> None:
         self.verbose = verbose
-        self.set_source(source)
-        self.subjectlist = None
-        self.ActiveTestInfo = None
+        self.setSource(source)
+        self.subjectList = None
+        self.activeTestInfo = None
 
-    def set_source(self, source):
+    def setSource(self, source):
         self.source = source
-        self.HDFfile = pd.HDFStore(source, mode='r')
+        self.hdfFile = pd.HDFStore(source, mode='r')
     
-    def get_subject_list(self):
-        self.subjectlist = self.HDFfile.get("/subject_list")
-        return(self.subjectlist)
+    def getSubjectList(self):
+        self.subjectList = self.hdfFile.get("/subject_list")
+        return(self.subjectList)
     
-    def subject_code_from_index(self, index, setSubject=False):
-        if type(self.subjectlist) == None:
-            self.get_subject_list()
+    def subjectCodeFromIndex(self, index, setSubject=False):
+        if type(self.subjectList) == None:
+            self.getSubjectList()
         if self.verbose is True:
             print('sub')
-            print(type(self.subjectlist))
+            print(type(self.subjectList))
             print('sub[index]')
-            print(type(self.subjectlist.iloc[index]))
+            print(type(self.subjectList.iloc[index]))
             # print(self.subjectlist.iloc[index])
-            print(f"Subject code: {self.subjectlist.iloc[index]}")
-        subjectCode = self.subjectlist.iloc[index]
+            print(f"Subject code: {self.subjectList.iloc[index]}")
+        subjectCode = self.subjectList.iloc[index]
         if type(subjectCode) is not str:
             subjectCode = subjectCode.to_string(index = False)
         return subjectCode
     
     def getActiveTestInfo(self, subjectID):
-        self.ActiveTestInfo = self.HDFfile.get(f"/{subjectID}/active_test_info")
-        return self.ActiveTestInfo
+        self.activeTestInfo = self.hdfFile.get(f"/{subjectID}/active_test_info")
+        return self.activeTestInfo
     
     def selectTestID(self, subjectID, testType, compleation = True):
         # if self.ActiveTestInfo == None:
@@ -47,14 +78,14 @@ class h5_handler():
             ati = ati.loc[ati['status'] == 'COMPLETE']
         elif compleation == False:
             ati = ati.loc[ati['status'] != 'COMPLETE']
-        selectedtests  = ati.loc[ati['type'] == testType]
-        return selectedtests['id'].to_list()
+        selectedTests  = ati.loc[ati['type'] == testType]
+        return selectedTests['id'].to_list()
 
 
         
 
     def getVicon(self, subjectID, testID):
-        return self.HDFfile.get(f"/{subjectID}/vicon/{testID}")
+        return self.hdfFile.get(f"/{subjectID}/vicon/{testID}")
     
 
     def getSmartphoneData(self, subjectID, trialID, deviceID, axisToggle = {'acc':True, 'gyr':True, 'mag':True }):
@@ -68,24 +99,24 @@ class h5_handler():
 
 
         if axisToggle['acc'] is True:
-            outputDict.update({'acc':self.HDFfile.get(f"/{subjectID}/smartphone/{trialID}/{deviceID}/acc")})
+            outputDict.update({'acc':self.hdfFile.get(f"/{subjectID}/smartphone/{trialID}/{deviceID}/acc")})
         if axisToggle['gyr'] is True:
-            outputDict.update({'gyr':self.HDFfile.get(f"/{subjectID}/smartphone/{trialID}/{deviceID}/gyr")})
+            outputDict.update({'gyr':self.hdfFile.get(f"/{subjectID}/smartphone/{trialID}/{deviceID}/gyr")})
         if axisToggle['mag'] is True:
-            outputDict.update({'mag':self.HDFfile.get(f"/{subjectID}/smartphone/{trialID}/{deviceID}/mag")})
+            outputDict.update({'mag':self.hdfFile.get(f"/{subjectID}/smartphone/{trialID}/{deviceID}/mag")})
 
         return outputDict
     
     def getDeviceLocations(self, subjectID, TrialID, Position):
 
-        deviceLocations = (self.HDFfile.get(f'/{subjectID}/smartphone_device_location'))
-        selecteddevice = deviceLocations.loc[deviceLocations['location'] == Position]
-        return selecteddevice["device_id"].to_string(index=False)
+        deviceLocations = (self.hdfFile.get(f'/{subjectID}/smartphone_device_location'))
+        selectedDevice = deviceLocations.loc[deviceLocations['location'] == Position]
+        return selectedDevice["device_id"].to_string(index=False)
 
 
 
 
-def createdummydata():
+def createDummyData():
     hdf = pd.HDFStore('dummy_h5.h5', mode='w')
     hdf.put('abcd', pd.DataFrame(np.random.rand(3,3)))
     testid = [10,11,15,20]
@@ -119,14 +150,14 @@ def createdummydata():
     hdf.close()
 
 ### development ###
-createdummydata()
+# createDummyData()
 
     
 source = DataLoader().data_file_path
 
-trialdata = h5_handler(source, verbose=True)
-print(trialdata.get_subject_list())
-subjectid = trialdata.subject_code_from_index(0)
+trialdata = H5Handler(source, verbose=True)
+print(trialdata.getSubjectList())
+subjectid = trialdata.subjectCodeFromIndex(0)
 print(f"subjectID:{subjectid}")
 print(trialdata.getActiveTestInfo(subjectid))
 

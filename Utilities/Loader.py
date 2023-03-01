@@ -9,6 +9,8 @@ class DataLoader():
     ----------
     data_path_input = None
         Opoptunity to provide an alternitive data locator path (files such as .txt), or the path to the data (files with the extention .h5)
+    verbose = False
+        Bool determins if functions print full messages or limited messages
 
     Methods
     -------
