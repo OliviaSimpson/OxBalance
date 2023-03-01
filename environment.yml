@@ -1,0 +1,10 @@
+name: OxBalance
+channels:
+  - defaults
+dependencies:
+  # tools for reading hdf
+  - h5py>=3.7.0
+  - pandas
+  - pytables
+  # other
+prefix: /home/olisim/miniconda3/envs/OxBalance
