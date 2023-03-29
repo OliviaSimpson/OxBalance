@@ -17,7 +17,7 @@ Funding from:
 - Accademic:
     - Amy Zavatsky (https://eng.ox.ac.uk/people/amy-zavatsky/)
     - Joe Pitt-Francis (https://www.cs.ox.ac.uk/people/joe.pitt-francis/)
-- Industiral:
+- Industrial:
     - Mattia Zanon (https://www.roche.com/innovation/structure/pred/)
     - Dimitar Stanev (https://www.roche.com/innovation/structure/pred/)
 
@@ -32,7 +32,10 @@ Released open source under Licencse: https://github.com/OliviaSimpson/OxBalance/
 - Work package 1
     - Basic analysis of clinical trial data, and exploration of biomarkers/features describing balance.
 - Work Package 2
-    - work yet to start
+    - Work Package 2.a
+        - work yet to start
+    - Work Package 2.b
+        - work yet to start
 - Work Package 3
     - work yet to start
 - Work Package 4
